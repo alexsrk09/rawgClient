@@ -1,30 +1,30 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { fetchGames, searchGames } from "../services/api"
-import GameCard from "../components/GameCard"
+import { Link } from "react-router-dom"
+import { fetchPublishers, searchPublishers } from "../services/api"
 import Pagination from "../components/Pagination"
 
-const GamesPage = () => {
-  const [games, setGames] = useState([])
+const PublishersPage = () => {
+  const [publishers, setPublishers] = useState([])
   const [searchTerm, setSearchTerm] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(0)
 
   useEffect(() => {
-    const loadGames = async () => {
-      const result = await fetchGames(currentPage)
-      setGames(result.results)
+    const loadPublishers = async () => {
+      const result = await fetchPublishers(currentPage)
+      setPublishers(result.results)
       setTotalPages(Math.ceil(result.count / 20))
     }
-    loadGames()
+    loadPublishers()
   }, [currentPage])
 
   const handleSearch = async (e) => {
     e.preventDefault()
     if (searchTerm) {
-      const result = await searchGames(searchTerm, 1)
-      setGames(result.results)
+      const result = await searchPublishers(searchTerm, 1)
+      setPublishers(result.results)
       setTotalPages(Math.ceil(result.count / 20))
       setCurrentPage(1)
     }
@@ -32,7 +32,7 @@ const GamesPage = () => {
 
   return (
     <div className="container py-5">
-      <h1 className="display-4 mb-4">Explore Games</h1>
+      <h1 className="display-4 mb-4">Explore Publishers</h1>
       <form onSubmit={handleSearch} className="mb-4">
         <div className="input-group">
           <input
@@ -40,18 +40,18 @@ const GamesPage = () => {
             className="form-control"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search for games..."
+            placeholder="Search for publishers..."
           />
           <button type="submit" className="btn btn-primary">
             Search
           </button>
         </div>
       </form>
-      <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-        {games.map((game) => (
-          <div key={game.id} className="col">
-            <GameCard game={game} />
-          </div>
+      <div className="list-group">
+        {publishers.map((publisher) => (
+          <Link key={publisher.id} to={`/publisher/${publisher.id}`} className="list-group-item list-group-item-action">
+            {publisher.name}
+          </Link>
         ))}
       </div>
       <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
@@ -59,5 +59,5 @@ const GamesPage = () => {
   )
 }
 
-export default GamesPage
+export default PublishersPage
 

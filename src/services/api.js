@@ -1,22 +1,49 @@
-const API_KEY = "e3f8413cbefe44c9be2f0f1de8ee1497"
+const API_KEY = "YOUR_RAWG_API_KEY"
 const BASE_URL = "https://api.rawg.io/api"
 
-// muestra los 20 juegos más populares, para los slider y presentaciones
-export const fetchPopularGames = async (num) => {
-  const response = await fetch(`${BASE_URL}/games?key=${API_KEY}&ordering=-metacritic&page_size=${num}`)
+export const fetchPopularGames = async () => {
+  const response = await fetch(`${BASE_URL}/games?key=${API_KEY}&ordering=-rating&page_size=10`)
   const data = await response.json()
   return data.results
 }
-// buscar por nombre
-export const searchGames = async (searchTerm) => {
-  const response = await fetch(`${BASE_URL}/games?key=${API_KEY}&search=${searchTerm}&page_size=20`)
-  const data = await response.json()
-  return data.results
+
+export const fetchGames = async (page = 1) => {
+  const response = await fetch(`${BASE_URL}/games?key=${API_KEY}&page=${page}&page_size=20`)
+  return await response.json()
 }
-// detalles de un juego (por id)
+
+export const searchGames = async (searchTerm, page = 1) => {
+  const response = await fetch(`${BASE_URL}/games?key=${API_KEY}&search=${searchTerm}&page=${page}&page_size=20`)
+  return await response.json()
+}
+
 export const fetchGameDetails = async (id) => {
   const response = await fetch(`${BASE_URL}/games/${id}?key=${API_KEY}`)
-  const data = await response.json()
-  return data
+  return await response.json()
+}
+
+export const fetchGamesByTagOrGenre = async (type, id, page = 1) => {
+  const response = await fetch(`${BASE_URL}/games?key=${API_KEY}&${type}s=${id}&page=${page}&page_size=20`)
+  return await response.json()
+}
+
+export const fetchPublisherDetails = async (id) => {
+  const response = await fetch(`${BASE_URL}/publishers/${id}?key=${API_KEY}`)
+  return await response.json()
+}
+
+export const fetchPublisherGames = async (id, page = 1) => {
+  const response = await fetch(`${BASE_URL}/games?key=${API_KEY}&publishers=${id}&page=${page}&page_size=20`)
+  return await response.json()
+}
+
+export const fetchPublishers = async (page = 1) => {
+  const response = await fetch(`${BASE_URL}/publishers?key=${API_KEY}&page=${page}&page_size=20`)
+  return await response.json()
+}
+
+export const searchPublishers = async (searchTerm, page = 1) => {
+  const response = await fetch(`${BASE_URL}/publishers?key=${API_KEY}&search=${searchTerm}&page=${page}&page_size=20`)
+  return await response.json()
 }
 

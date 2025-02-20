@@ -1,5 +1,7 @@
+"use client"
+
 import { useState, useEffect } from "react"
-import { useParams } from "react-router-dom"
+import { useParams, Link } from "react-router-dom"
 import { fetchGameDetails } from "../services/api"
 
 const GameDetailsPage = () => {
@@ -17,8 +19,7 @@ const GameDetailsPage = () => {
 
   const toggleFavorite = () => {
     setIsFavorite(!isFavorite)
-    // para guardar favoritos (si se me canta el huevo)
-    // por ahora es inutil el button
+    // Here you would typically update this in a database or local storage
   }
 
   if (!game) {
@@ -55,7 +56,28 @@ const GameDetailsPage = () => {
               <strong>Platforms:</strong> {game.platforms.map((p) => p.platform.name).join(", ")}
             </li>
             <li className="list-group-item">
-              <strong>Genres:</strong> {game.genres.map((g) => g.name).join(", ")}
+              <strong>Genres:</strong>
+              {game.genres.map((genre, index) => (
+                <Link key={genre.id} to={`/games/genre/${genre.id}`} className="badge bg-secondary me-1">
+                  {genre.name}
+                </Link>
+              ))}
+            </li>
+            <li className="list-group-item">
+              <strong>Tags:</strong>
+              {game.tags.map((tag, index) => (
+                <Link key={tag.id} to={`/games/tag/${tag.id}`} className="badge bg-info me-1">
+                  {tag.name}
+                </Link>
+              ))}
+            </li>
+            <li className="list-group-item">
+              <strong>Publishers:</strong>
+              {game.publishers.map((publisher, index) => (
+                <Link key={publisher.id} to={`/publisher/${publisher.id}`} className="badge bg-primary me-1">
+                  {publisher.name}
+                </Link>
+              ))}
             </li>
           </ul>
         </div>
