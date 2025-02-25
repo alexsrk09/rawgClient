@@ -4,24 +4,40 @@ import { useState, useEffect } from "react"
 import { useParams, Link } from "react-router-dom"
 import { fetchGameDetails } from "../services/api"
 
+/**
+ * @function GameDetailsPage
+ * @description Componente que muestra los detalles de un juego específico.
+ * Permite agregar o quitar el juego de favoritos.
+ * @returns {JSX.Element} Componente con los detalles del juego.
+ */
 const GameDetailsPage = () => {
-  const [game, setGame] = useState(null)
-  const [isFavorite, setIsFavorite] = useState(false)
-  const { id } = useParams()
+  const [game, setGame] = useState(null) // Estado para almacenar los detalles del juego
+  const [isFavorite, setIsFavorite] = useState(false) // Estado para controlar si el juego es favorito
+  const { id } = useParams() // Obtiene el ID del juego de los parámetros de la URL
 
   useEffect(() => {
+    /**
+     * @async
+     * @function loadGameDetails
+     * @description Carga los detalles del juego desde la API y actualiza el estado.
+     */
     const loadGameDetails = async () => {
-      const gameDetails = await fetchGameDetails(id)
-      setGame(gameDetails)
+      const gameDetails = await fetchGameDetails(id) // Llama a la API para obtener detalles del juego
+      setGame(gameDetails) // Actualiza el estado con los detalles del juego
     }
-    loadGameDetails()
-  }, [id])
+    loadGameDetails() // Ejecuta la función para cargar los detalles del juego
+  }, [id]) // Se ejecuta cuando el ID cambia
 
+  /**
+   * @function toggleFavorite
+   * @description Cambia el estado de favorito del juego.
+   */
   const toggleFavorite = () => {
-    setIsFavorite(!isFavorite)
-    // Here you would typically update this in a database or local storage
+    setIsFavorite(!isFavorite) // Alterna el estado de favorito
+    // Aquí se podría actualizar la información en una base de datos o almacenamiento local
   }
 
+  // Si los detalles del juego aún no se han cargado, muestra un mensaje de carga
   if (!game) {
     return <div className="container py-5 text-center">Loading...</div>
   }
@@ -87,4 +103,3 @@ const GameDetailsPage = () => {
 }
 
 export default GameDetailsPage
-
