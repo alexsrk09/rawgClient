@@ -2,7 +2,7 @@ const API_KEY = "e3f8413cbefe44c9be2f0f1de8ee1497"
 const BASE_URL = "https://api.rawg.io/api"
 
 export const fetchPopularGames = async () => {
-  const response = await fetch(`${BASE_URL}/games?key=${API_KEY}&ordering=-rating&page_size=10`)
+  const response = await fetch(`${BASE_URL}/games?key=${API_KEY}&ordering=-metacritic&page_size=10`)
   const data = await response.json()
   return data.results
 }
