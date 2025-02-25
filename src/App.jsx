@@ -5,8 +5,8 @@ import HomePage from "./pages/HomePage"
 import GamesPage from "./pages/GamesPage"
 import GameDetailsPage from "./pages/GameDetailsPage"
 import GamesByTagOrGenrePage from "./pages/GamesByTagOrGenrePage"
-import PublisherPage from "./pages/PublisherPage"
 import PublishersPage from "./pages/PublishersPage"
+import PublisherDetailsPage from "./pages/PublisherDetailsPage"
 import TagsPage from "./pages/TagsPage"
 
 function App() {
@@ -20,8 +20,8 @@ function App() {
             <Route path="/games" element={<GamesPage />} />
             <Route path="/game/:id" element={<GameDetailsPage />} />
             <Route path="/games/:type/:id" element={<GamesByTagOrGenrePage />} />
-            <Route path="/publisher/:id" element={<PublisherPage />} />
             <Route path="/publishers" element={<PublishersPage />} />
+            <Route path="/publisher/:id" element={<PublisherDetailsPage />} />
             <Route path="/tags" element={<TagsPage />} />
           </Routes>
         </main>

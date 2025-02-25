@@ -49,8 +49,13 @@ const PublishersPage = () => {
       </form>
       <div className="list-group">
         {publishers.map((publisher) => (
-          <Link key={publisher.id} to={`/publisher/${publisher.id}`} className="list-group-item list-group-item-action">
+          <Link
+            key={publisher.id}
+            to={`/publisher/${publisher.id}`}
+            className="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+          >
             {publisher.name}
+            <span className="badge bg-primary rounded-pill">{publisher.games_count} games</span>
           </Link>
         ))}
       </div>
