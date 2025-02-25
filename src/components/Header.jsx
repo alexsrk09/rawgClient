@@ -19,6 +19,16 @@ const Header = () => {
                 Games
               </Link>
             </li>
+            <li className="nav-item">
+              <Link to="/publishers" className="nav-link text-white">
+                Publishers
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link to="/tags" className="nav-link text-white">
+                Tags
+              </Link>
+            </li>
           </ul>
         </div>
       </nav>

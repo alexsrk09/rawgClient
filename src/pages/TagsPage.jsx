@@ -2,29 +2,29 @@
 
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
-import { fetchPublishers, searchPublishers } from "../services/api"
+import { fetchTags, searchTags } from "../services/api"
 import Pagination from "../components/Pagination"
 
-const PublishersPage = () => {
-  const [publishers, setPublishers] = useState([])
+const TagsPage = () => {
+  const [tags, setTags] = useState([])
   const [searchTerm, setSearchTerm] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(0)
 
   useEffect(() => {
-    const loadPublishers = async () => {
-      const result = await fetchPublishers(currentPage)
-      setPublishers(result.results)
+    const loadTags = async () => {
+      const result = await fetchTags(currentPage)
+      setTags(result.results)
       setTotalPages(Math.ceil(result.count / 20))
     }
-    loadPublishers()
+    loadTags()
   }, [currentPage])
 
   const handleSearch = async (e) => {
     e.preventDefault()
     if (searchTerm) {
-      const result = await searchPublishers(searchTerm, 1)
-      setPublishers(result.results)
+      const result = await searchTags(searchTerm, 1)
+      setTags(result.results)
       setTotalPages(Math.ceil(result.count / 20))
       setCurrentPage(1)
     }
@@ -32,7 +32,7 @@ const PublishersPage = () => {
 
   return (
     <div className="container py-5">
-      <h1 className="display-4 mb-4">Explore Publishers</h1>
+      <h1 className="display-4 mb-4">Explore Tags</h1>
       <form onSubmit={handleSearch} className="mb-4">
         <div className="input-group">
           <input
@@ -40,7 +40,7 @@ const PublishersPage = () => {
             className="form-control"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search for publishers..."
+            placeholder="Search for tags..."
           />
           <button type="submit" className="btn btn-primary">
             Search
@@ -48,13 +48,13 @@ const PublishersPage = () => {
         </div>
       </form>
       <div className="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
-        {publishers.map((publisher) => (
-          <div key={publisher.id} className="col">
-            <Link to={`/publisher/${publisher.id}`} className="text-decoration-none">
+        {tags.map((tag) => (
+          <div key={tag.id} className="col">
+            <Link to={`/games/tag/${tag.id}`} className="text-decoration-none">
               <div className="card h-100">
                 <div className="card-body">
-                  <h5 className="card-title">{publisher.name}</h5>
-                  <p className="card-text text-muted">Games count: {publisher.games_count}</p>
+                  <h5 className="card-title">{tag.name}</h5>
+                  <p className="card-text text-muted">Games count: {tag.games_count}</p>
                 </div>
               </div>
             </Link>
@@ -66,5 +66,5 @@ const PublishersPage = () => {
   )
 }
 
-export default PublishersPage
+export default TagsPage
 
