@@ -1,34 +1,74 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { fetchGames, searchGames } from "../services/api"
+import { useEffect, useState } from "react"
+import { useSelector, useDispatch } from "react-redux"
+import { getGames, searchGamesThunk, setCurrentPage } from "../store/slices/gamesSlice"
 import GameCard from "../components/GameCard"
 import Pagination from "../components/Pagination"
+import GameSorter from "../components/GameSorter"
 
 const GamesPage = () => {
-  const [games, setGames] = useState([])
+  const dispatch = useDispatch()
+  const { games, loading, error, totalPages, currentPage, sortCriteria, sortDirection } = useSelector(
+    (state) => state.games,
+  )
   const [searchTerm, setSearchTerm] = useState("")
-  const [currentPage, setCurrentPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(0)
 
   useEffect(() => {
-    const loadGames = async () => {
-      const result = await fetchGames(currentPage)
-      setGames(result.results)
-      setTotalPages(Math.ceil(result.count / 20))
-    }
-    loadGames()
-  }, [currentPage])
+    dispatch(getGames(currentPage))
+  }, [dispatch, currentPage])
 
-  const handleSearch = async (e) => {
+  const handleSearch = (e) => {
     e.preventDefault()
     if (searchTerm) {
-      const result = await searchGames(searchTerm, 1)
-      setGames(result.results)
-      setTotalPages(Math.ceil(result.count / 20))
-      setCurrentPage(1)
+      dispatch(searchGamesThunk({ searchTerm, page: 1 }))
+      dispatch(setCurrentPage(1))
     }
   }
+
+  const handlePageChange = (page) => {
+    dispatch(setCurrentPage(page))
+    window.scrollTo(0, 0)
+  }
+
+  // Sort games based on criteria and direction
+  const sortedGames = [...games].sort((a, b) => {
+    let valueA, valueB
+
+    // Get the values to compare based on the sort criteria
+    switch (sortCriteria) {
+      case "name":
+        valueA = a.name.toLowerCase()
+        valueB = b.name.toLowerCase()
+        break
+      case "released":
+        valueA = new Date(a.released || "1900-01-01")
+        valueB = new Date(b.released || "1900-01-01")
+        break
+      case "rating":
+        valueA = a.rating || 0
+        valueB = b.rating || 0
+        break
+      case "added":
+        valueA = a.added || 0
+        valueB = b.added || 0
+        break
+      default:
+        valueA = a.name.toLowerCase()
+        valueB = b.name.toLowerCase()
+    }
+
+    // Compare the values based on the sort direction
+    if (sortDirection === "asc") {
+      if (valueA < valueB) return -1
+      if (valueA > valueB) return 1
+      return 0
+    } else {
+      if (valueA > valueB) return -1
+      if (valueA < valueB) return 1
+      return 0
+    }
+  })
 
   return (
     <div className="container py-5">
@@ -47,14 +87,25 @@ const GamesPage = () => {
           </button>
         </div>
       </form>
-      <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-        {games.map((game) => (
-          <div key={game.id} className="col">
-            <GameCard game={game} />
+
+      <GameSorter />
+
+      {loading ? (
+        <div className="text-center">Loading...</div>
+      ) : error ? (
+        <div className="alert alert-danger">{error}</div>
+      ) : (
+        <>
+          <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {sortedGames.map((game) => (
+              <div key={game.id} className="col">
+                <GameCard game={game} />
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-      <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+        </>
+      )}
     </div>
   )
 }

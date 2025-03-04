@@ -1,33 +1,31 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
-import { fetchPublishers, searchPublishers } from "../services/api"
+import { useSelector, useDispatch } from "react-redux"
+import { getPublishers, searchPublishersThunk, setCurrentPage } from "../store/slices/gamesSlice"
 import Pagination from "../components/Pagination"
 
 const PublishersPage = () => {
-  const [publishers, setPublishers] = useState([])
+  const dispatch = useDispatch()
+  const { publishers, loading, error, totalPages, currentPage } = useSelector((state) => state.games)
   const [searchTerm, setSearchTerm] = useState("")
-  const [currentPage, setCurrentPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(0)
 
   useEffect(() => {
-    const loadPublishers = async () => {
-      const result = await fetchPublishers(currentPage)
-      setPublishers(result.results)
-      setTotalPages(Math.ceil(result.count / 20))
-    }
-    loadPublishers()
-  }, [currentPage])
+    dispatch(getPublishers(currentPage))
+  }, [dispatch, currentPage])
 
-  const handleSearch = async (e) => {
+  const handleSearch = (e) => {
     e.preventDefault()
     if (searchTerm) {
-      const result = await searchPublishers(searchTerm, 1)
-      setPublishers(result.results)
-      setTotalPages(Math.ceil(result.count / 20))
-      setCurrentPage(1)
+      dispatch(searchPublishersThunk({ searchTerm, page: 1 }))
+      dispatch(setCurrentPage(1))
     }
+  }
+
+  const handlePageChange = (page) => {
+    dispatch(setCurrentPage(page))
+    window.scrollTo(0, 0)
   }
 
   return (
@@ -47,19 +45,28 @@ const PublishersPage = () => {
           </button>
         </div>
       </form>
-      <div className="list-group">
-        {publishers.map((publisher) => (
-          <Link
-            key={publisher.id}
-            to={`/publisher/${publisher.id}`}
-            className="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
-          >
-            {publisher.name}
-            <span className="badge bg-primary rounded-pill">{publisher.games_count} games</span>
-          </Link>
-        ))}
-      </div>
-      <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+
+      {loading ? (
+        <div className="text-center">Loading...</div>
+      ) : error ? (
+        <div className="alert alert-danger">{error}</div>
+      ) : (
+        <>
+          <div className="list-group">
+            {publishers.map((publisher) => (
+              <Link
+                key={publisher.id}
+                to={`/publisher/${publisher.id}`}
+                className="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+              >
+                {publisher.name}
+                <span className="badge bg-primary rounded-pill">{publisher.games_count} games</span>
+              </Link>
+            ))}
+          </div>
+          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+        </>
+      )}
     </div>
   )
 }

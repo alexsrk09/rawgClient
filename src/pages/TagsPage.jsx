@@ -1,33 +1,31 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
-import { fetchTags, searchTags } from "../services/api"
+import { useSelector, useDispatch } from "react-redux"
+import { getTags, searchTagsThunk, setCurrentPage } from "../store/slices/gamesSlice"
 import Pagination from "../components/Pagination"
 
 const TagsPage = () => {
-  const [tags, setTags] = useState([])
+  const dispatch = useDispatch()
+  const { tags, loading, error, totalPages, currentPage } = useSelector((state) => state.games)
   const [searchTerm, setSearchTerm] = useState("")
-  const [currentPage, setCurrentPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(0)
 
   useEffect(() => {
-    const loadTags = async () => {
-      const result = await fetchTags(currentPage)
-      setTags(result.results)
-      setTotalPages(Math.ceil(result.count / 20))
-    }
-    loadTags()
-  }, [currentPage])
+    dispatch(getTags(currentPage))
+  }, [dispatch, currentPage])
 
-  const handleSearch = async (e) => {
+  const handleSearch = (e) => {
     e.preventDefault()
     if (searchTerm) {
-      const result = await searchTags(searchTerm, 1)
-      setTags(result.results)
-      setTotalPages(Math.ceil(result.count / 20))
-      setCurrentPage(1)
+      dispatch(searchTagsThunk({ searchTerm, page: 1 }))
+      dispatch(setCurrentPage(1))
     }
+  }
+
+  const handlePageChange = (page) => {
+    dispatch(setCurrentPage(page))
+    window.scrollTo(0, 0)
   }
 
   return (
@@ -47,21 +45,30 @@ const TagsPage = () => {
           </button>
         </div>
       </form>
-      <div className="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
-        {tags.map((tag) => (
-          <div key={tag.id} className="col">
-            <Link to={`/games/tag/${tag.id}`} className="text-decoration-none">
-              <div className="card h-100">
-                <div className="card-body">
-                  <h5 className="card-title">{tag.name}</h5>
-                  <p className="card-text text-muted">Games count: {tag.games_count}</p>
-                </div>
+
+      {loading ? (
+        <div className="text-center">Loading...</div>
+      ) : error ? (
+        <div className="alert alert-danger">{error}</div>
+      ) : (
+        <>
+          <div className="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+            {tags.map((tag) => (
+              <div key={tag.id} className="col">
+                <Link to={`/games/tag/${tag.id}`} className="text-decoration-none">
+                  <div className="card h-100">
+                    <div className="card-body">
+                      <h5 className="card-title">{tag.name}</h5>
+                      <p className="card-text text-muted">Games count: {tag.games_count}</p>
+                    </div>
+                  </div>
+                </Link>
               </div>
-            </Link>
+            ))}
           </div>
-        ))}
-      </div>
-      <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+        </>
+      )}
     </div>
   )
 }
