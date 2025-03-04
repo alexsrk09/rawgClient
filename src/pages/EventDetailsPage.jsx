@@ -20,7 +20,7 @@ const EventDetailsPage = () => {
   useEffect(() => {
     if (currentEvent) {
       // Generate QR code for sharing
-      const qrCodeUrl = `${window.location.origin}/event-registration/${currentEvent.id}`
+      const qrCodeUrl = `${window.location.origin}/event/${currentEvent.id}`
       const canvas = document.getElementById("qrcode")
 
       if (canvas) {
